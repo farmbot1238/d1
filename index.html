@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قسم الدين - امتحانات تفاعلية</title>
+    <title>نور الدين - امتحانات تفاعلية</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,85 +12,193 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            font-family: 'Amiri', 'Traditional Arabic', 'Scheherazade', 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #1a2f1f, #2d4a33);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M25,30 L75,30 L80,50 L75,70 L25,70 L20,50 L25,30" fill="none" stroke="%23d4af37" stroke-width="2"/><circle cx="50" cy="40" r="5" fill="%23d4af37"/><path d="M40,55 L60,55" stroke="%23d4af37" stroke-width="2"/></svg>');
+            background-repeat: repeat;
+            background-size: 100px 100px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 850px;
             width: 100%;
-            background-color: #ffffff;
-            border-radius: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: linear-gradient(145deg, #fef9e7, #f5e9d8);
+            border-radius: 40px 40px 20px 20px;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.3), 0 0 0 2px #b7935e, 0 0 0 5px #6b4f2a;
             overflow: hidden;
             transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .container::before {
+            content: "﷽";
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 1.8em;
+            color: #b7935e;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            opacity: 0.4;
+            font-weight: bold;
         }
 
         .header {
-            background: linear-gradient(135deg, #2b5876, #4e4376);
-            color: white;
-            padding: 30px;
+            background: linear-gradient(145deg, #0f4e3a, #1b3b2b);
+            color: #f5d7a1;
+            padding: 30px 20px;
             text-align: center;
+            border-bottom: 5px solid #b7935e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "✿";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 80px;
+            color: rgba(183, 147, 94, 0.2);
+            transform: rotate(15deg);
+        }
+
+        .header::after {
+            content: "✿";
+            position: absolute;
+            bottom: -20px;
+            left: -10px;
+            font-size: 80px;
+            color: rgba(183, 147, 94, 0.2);
+            transform: rotate(-10deg);
         }
 
         .header h1 {
-            font-size: 2.5em;
+            font-size: 3em;
             margin-bottom: 10px;
             font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            letter-spacing: 2px;
+        }
+
+        .header h1 span {
+            display: inline-block;
+            background: #b7935e;
+            color: #0f4e3a;
+            padding: 0 15px;
+            border-radius: 50px;
+            font-size: 0.8em;
+            margin: 0 5px;
         }
 
         .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-style: italic;
         }
 
         .main-menu {
-            padding: 30px;
+            padding: 40px 30px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            background-color: #f8f9fa;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 20px;
+            background: linear-gradient(145deg, #fef9e7, #faedd9);
+            position: relative;
+        }
+
+        .main-menu::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #b7935e, #8b6b42, #b7935e, transparent);
         }
 
         .menu-btn {
-            background: white;
-            border: 2px solid #4e4376;
-            color: #4e4376;
-            padding: 20px 10px;
-            font-size: 1.2em;
+            background: linear-gradient(145deg, #faf0db, #eddbbd);
+            border: 2px solid #8b6b42;
+            color: #1b3b2b;
+            padding: 25px 10px;
+            font-size: 1.3em;
             font-weight: bold;
-            border-radius: 15px;
+            border-radius: 30px 30px 15px 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn::before {
+            content: "﴿﴾";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 1em;
+            color: #b7935e;
+            opacity: 0.3;
+        }
+
+        .menu-btn::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #b7935e, #ffd966, #b7935e);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .menu-btn:hover {
-            background: #4e4376;
-            color: white;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(78, 67, 118, 0.3);
+            background: linear-gradient(145deg, #0f4e3a, #1b3b2b);
+            color: #f5d7a1;
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px rgba(15, 78, 58, 0.4);
+            border-color: #f5d7a1;
+        }
+
+        .menu-btn:hover::after {
+            opacity: 1;
         }
 
         .menu-btn.special {
-            background: #2b5876;
-            border-color: #2b5876;
-            color: white;
+            background: linear-gradient(145deg, #8b1538, #5a0c25);
+            color: #f5d7a1;
+            border-color: #d4af37;
+            grid-column: span 2;
         }
 
         .menu-btn.special:hover {
-            background: #1a3a4f;
-            border-color: #1a3a4f;
+            background: linear-gradient(145deg, #5a0c25, #3d0819);
+            border-color: #ffd966;
         }
 
         .quiz-area {
-            padding: 30px;
-            background-color: #ffffff;
+            padding: 35px;
+            background: linear-gradient(145deg, #fef9e7, #f8ebd2);
+            position: relative;
+        }
+
+        .quiz-area::before {
+            content: "〆";
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 40px;
+            color: #b7935e;
+            opacity: 0.2;
+            transform: rotate(10deg);
         }
 
         .question-header {
@@ -98,168 +206,309 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e9ecef;
+            padding: 15px 20px;
+            background: linear-gradient(145deg, #0f4e3a, #1b3b2b);
+            border-radius: 50px;
+            color: #f5d7a1;
+            border: 1px solid #b7935e;
         }
 
         .progress {
-            background-color: #e9ecef;
+            background-color: #3d2b1a;
             border-radius: 50px;
-            height: 10px;
+            height: 12px;
             flex-grow: 1;
             margin: 0 20px;
+            border: 1px solid #b7935e;
         }
 
         .progress-bar {
-            height: 10px;
-            background: linear-gradient(90deg, #2b5876, #4e4376);
+            height: 12px;
+            background: linear-gradient(90deg, #b7935e, #f5d7a1, #b7935e);
             border-radius: 50px;
             width: 0%;
             transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .question-text {
-            font-size: 1.3em;
+            font-size: 1.5em;
             font-weight: 600;
-            color: #2b5876;
-            margin-bottom: 25px;
-            line-height: 1.6;
+            color: #1b3b2b;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            padding: 20px;
+            background: rgba(183, 147, 94, 0.1);
+            border-radius: 30px;
+            border-right: 8px solid #b7935e;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
         }
 
         .options {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-bottom: 35px;
         }
 
         .option {
-            background: #f8f9fa;
-            border: 2px solid #dee2e6;
-            border-radius: 12px;
-            padding: 15px 20px;
+            background: linear-gradient(145deg, #fff5e6, #f5e0c5);
+            border: 2px solid #b7935e;
+            border-radius: 50px;
+            padding: 18px 25px;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 1.1em;
+            font-size: 1.2em;
+            color: #1b3b2b;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            position: relative;
+            padding-right: 60px;
+        }
+
+        .option::before {
+            content: "○";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3em;
+            color: #b7935e;
+            transition: all 0.2s ease;
         }
 
         .option:hover {
-            background: #e9ecef;
-            border-color: #adb5bd;
+            background: linear-gradient(145deg, #eddbbd, #e0c9a5);
+            border-color: #8b6b42;
+            transform: translateX(-5px);
+            box-shadow: 0 10px 20px rgba(139, 107, 66, 0.2);
+        }
+
+        .option:hover::before {
+            content: "◉";
+            color: #0f4e3a;
         }
 
         .option.selected {
-            background: #4e4376;
-            color: white;
-            border-color: #4e4376;
+            background: linear-gradient(145deg, #0f4e3a, #1b3b2b);
+            color: #f5d7a1;
+            border-color: #d4af37;
+        }
+
+        .option.selected::before {
+            content: "◉";
+            color: #f5d7a1;
         }
 
         .nav-buttons {
             display: flex;
             justify-content: space-between;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .nav-btn {
-            padding: 12px 30px;
+            padding: 15px 40px;
             border: none;
             border-radius: 50px;
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            background-color: #6c757d;
-            color: white;
+            background-color: #6b4f2a;
+            color: #f5d7a1;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            border: 2px solid transparent;
         }
 
         .nav-btn:enabled {
-            background: linear-gradient(135deg, #2b5876, #4e4376);
+            background: linear-gradient(145deg, #8b6b42, #5a3e1f);
+            border-color: #b7935e;
         }
 
         .nav-btn:enabled:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(43, 88, 118, 0.3);
+            background: linear-gradient(145deg, #5a3e1f, #3d2b1a);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(90, 62, 31, 0.3);
+            border-color: #f5d7a1;
+            color: #ffffff;
         }
 
         .nav-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background: #6c757d;
         }
 
         .result-area {
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
+            background: linear-gradient(145deg, #fef9e7, #f5e0c5);
         }
 
         .score-card {
-            background: linear-gradient(135deg, #2b5876, #4e4376);
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 30px;
+            background: linear-gradient(145deg, #0f4e3a, #1b3b2b);
+            color: #f5d7a1;
+            padding: 35px;
+            border-radius: 50px;
+            margin-bottom: 40px;
+            border: 3px solid #b7935e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-card::before {
+            content: "★";
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 40px;
+            color: #b7935e;
+            opacity: 0.3;
+            animation: spin 10s linear infinite;
+        }
+
+        .score-card::after {
+            content: "★";
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            font-size: 30px;
+            color: #b7935e;
+            opacity: 0.3;
+            animation: spin 8s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .score {
-            font-size: 4em;
+            font-size: 5em;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 15px 0;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
         }
 
         .details-table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 25px;
+            font-size: 0.95em;
         }
 
         .details-table th {
-            background: #2b5876;
-            color: white;
-            padding: 12px;
+            background: linear-gradient(145deg, #0f4e3a, #1b3b2b);
+            color: #f5d7a1;
+            padding: 15px;
+            font-weight: bold;
+            border: 2px solid #b7935e;
+        }
+
+        .details-table th:first-child {
+            border-radius: 30px 0 0 30px;
+        }
+
+        .details-table th:last-child {
+            border-radius: 0 30px 30px 0;
         }
 
         .details-table td {
-            padding: 12px;
-            border-bottom: 1px solid #dee2e6;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #b7935e;
         }
 
-        .details-table tr:last-child td {
-            border-bottom: none;
+        .details-table td:first-child {
+            border-radius: 20px 0 0 20px;
+        }
+
+        .details-table td:last-child {
+            border-radius: 0 20px 20px 0;
         }
 
         .correct-answer {
-            color: #28a745;
+            color: #0f4e3a;
             font-weight: bold;
+            background: rgba(15, 78, 58, 0.1);
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
         }
 
         .wrong-answer {
-            color: #dc3545;
+            color: #8b1538;
             font-weight: bold;
+            background: rgba(139, 21, 56, 0.1);
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
         }
 
         .back-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 15px 40px;
+            background: linear-gradient(145deg, #8b6b42, #5a3e1f);
+            color: #f5d7a1;
+            border: 3px solid #b7935e;
+            padding: 18px 50px;
             border-radius: 50px;
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 30px;
             transition: all 0.3s ease;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
         }
 
         .back-btn:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
+            background: linear-gradient(145deg, #5a3e1f, #3d2b1a);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(90, 62, 31, 0.4);
+            border-color: #f5d7a1;
+            color: #ffffff;
         }
 
         .hidden {
             display: none;
+        }
+
+        /* تزيين إضافي */
+        .islamic-pattern {
+            height: 10px;
+            background: linear-gradient(90deg, #0f4e3a 20%, #b7935e 40%, #f5d7a1 60%, #b7935e 80%, #0f4e3a 100%);
+            margin: 5px 0;
+        }
+
+        .footer-text {
+            text-align: center;
+            padding: 15px;
+            background: #0f4e3a;
+            color: #b7935e;
+            font-size: 0.9em;
+            border-top: 3px solid #b7935e;
+        }
+
+        .footer-text span {
+            color: #f5d7a1;
         }
     </style>
 </head>
@@ -267,8 +516,9 @@
     <div class="container" id="app">
         <!-- رأس الموقع -->
         <div class="header">
-            <h1>📚 قسم الدين</h1>
-            <p>اختبر معلوماتك في التربية الإسلامية - الصف الحادي عشر</p>
+            <h1>📖 <span>نور</span> الدين <span>✨</span></h1>
+            <p>وَ قُلْ رَبِّ زِدْنِي عِلْمًا</p>
+            <div class="islamic-pattern"></div>
         </div>
 
         <!-- القائمة الرئيسية -->
@@ -304,15 +554,21 @@
         <!-- منطقة النتيجة -->
         <div id="resultArea" class="result-area hidden">
             <div class="score-card">
-                <h2>نتيجتك</h2>
+                <h2>نتيجتك في الاختبار</h2>
                 <div id="scoreDisplay" class="score">0/0</div>
                 <p id="percentageDisplay">0%</p>
+                <p style="font-size: 1.2em;">﴿ فَمَنْ يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ ﴾</p>
             </div>
 
-            <h3 style="margin-bottom: 20px;">تفاصيل الإجابات:</h3>
+            <h3 style="margin-bottom: 20px; color: #0f4e3a;">تفاصيل الإجابات:</h3>
             <div id="detailsContainer"></div>
 
             <button class="back-btn" onclick="backToMenu()">العودة للقائمة الرئيسية</button>
+        </div>
+
+        <!-- تذييل -->
+        <div class="footer-text">
+            <span>✿</span> بسم الله الرحمن الرحيم <span>✿</span>
         </div>
     </div>
 
@@ -351,7 +607,7 @@
                 { question: "أول مصنّف في الحديث النبوي الشريف هو:", options: ["صحيح البخاري", "موطأ الإمام مالك", "مسند أحمد", "سنن ابن ماجه"], answer: 1 },
                 { question: "وقعت غزوة تبوك في السنة:", options: ["الثامنة للهجرة", "التاسعة للهجرة", "العاشرة للهجرة", "الخامسة للهجرة"], answer: 1 },
                 { question: "سُمي جيش المسلمين في تبوك بـ:", options: ["جيش الفتح", "جيش العسرة", "جيش اليرموك", "جيش المهاجرين"], answer: 1 },
-                { question: "من هو أكثر الصحابة إنفاقاً على جيش تبوك؟", options: ["أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "علي بن أبي طالب"], answer: 2 },
+                { question: "من هو أكثر الصحابة إنفاقاً على جيش تبوك؟", options: ["أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "علي بن طالب"], answer: 2 },
                 { question: "ما السبب المباشر ليوم تبوك؟", options: ["رغبة المسلمين في التجارة", "علم النبي بتجهز الروم للهجوم على المدينة", "فتح مكة", "الدفاع عن اليمن"], answer: 1 },
                 { question: "ما حكم ممارسة المرأة للحقوق السياسية في الإسلام؟", options: ["حرام", "جائزة كالرجل سواء بسواء", "مكروهة", "واجبة في كل وقت"], answer: 1 },
                 { question: "من هي الصحابية التي قاتلت دفاعاً عن النبي في يوم أحد؟", options: ["أم سلمة", "أم عمارة (نسيبة المازنية)", "أم سليم", "أم منيع"], answer: 1 },
