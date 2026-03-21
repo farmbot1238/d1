@@ -46,6 +46,7 @@
             font-family: 'Traditional Arabic', 'Amiri', serif;
             opacity: 0.4;
             font-weight: bold;
+            z-index: 1;
         }
 
         .header {
@@ -101,6 +102,31 @@
             font-size: 1.2em;
             opacity: 0.95;
             font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5em;
+            color: #0f4e3a;
+        }
+
+        .loading::after {
+            content: "⠋⠙⠹⠸⠼⠴⠦⠧";
+            animation: spinDots 0.8s steps(8) infinite;
+            display: inline-block;
+            font-size: 1.2em;
+        }
+
+        @keyframes spinDots {
+            0% { content: "⠋"; }
+            12.5% { content: "⠙"; }
+            25% { content: "⠹"; }
+            37.5% { content: "⠸"; }
+            50% { content: "⠼"; }
+            62.5% { content: "⠴"; }
+            75% { content: "⠦"; }
+            87.5% { content: "⠧"; }
         }
 
         .main-menu {
@@ -184,10 +210,17 @@
             border-color: #ffd966;
         }
 
+        .menu-btn:disabled {
+            opacity: 0.6;
+            cursor: wait;
+            transform: none;
+        }
+
         .quiz-area {
             padding: 35px;
             background: linear-gradient(145deg, #fef9e7, #f8ebd2);
             position: relative;
+            min-height: 500px;
         }
 
         .quiz-area::before {
@@ -491,7 +524,6 @@
             display: none;
         }
 
-        /* تزيين إضافي */
         .islamic-pattern {
             height: 10px;
             background: linear-gradient(90deg, #0f4e3a 20%, #b7935e 40%, #f5d7a1 60%, #b7935e 80%, #0f4e3a 100%);
@@ -510,27 +542,45 @@
         .footer-text span {
             color: #f5d7a1;
         }
+
+        .error-message {
+            text-align: center;
+            padding: 50px;
+            color: #8b1538;
+            font-size: 1.2em;
+            background: #fff5e6;
+            border-radius: 20px;
+            margin: 20px;
+        }
+
+        .error-message button {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: #0f4e3a;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1em;
+        }
     </style>
 </head>
 <body>
     <div class="container" id="app">
-        <!-- رأس الموقع -->
         <div class="header">
             <h1>📖 <span>نور</span> الدين <span>✨</span></h1>
             <p>وَ قُلْ رَبِّ زِدْنِي عِلْمًا</p>
             <div class="islamic-pattern"></div>
         </div>
 
-        <!-- القائمة الرئيسية -->
         <div id="mainMenu" class="main-menu">
-            <button class="menu-btn" onclick="startQuiz(1)">الوحدة الأولى</button>
-            <button class="menu-btn" onclick="startQuiz(2)">الوحدة الثانية</button>
-            <button class="menu-btn" onclick="startQuiz(3)">الوحدة الثالثة</button>
-            <button class="menu-btn" onclick="startQuiz(4)">الوحدة الرابعة</button>
-            <button class="menu-btn special" onclick="startQuiz('final')">📝 الامتحان الشامل</button>
+            <button class="menu-btn" onclick="loadUnit(1)">الوحدة الأولى</button>
+            <button class="menu-btn" onclick="loadUnit(2)">الوحدة الثانية</button>
+            <button class="menu-btn" onclick="loadUnit(3)">الوحدة الثالثة</button>
+            <button class="menu-btn" onclick="loadUnit(4)">الوحدة الرابعة</button>
+            <button class="menu-btn special" onclick="loadFinalExam()">📝 الامتحان الشامل</button>
         </div>
 
-        <!-- منطقة الامتحان -->
         <div id="quizArea" class="quiz-area hidden">
             <div class="question-header">
                 <span id="questionCounter">سؤال 1/20</span>
@@ -538,20 +588,14 @@
                     <div id="progressBar" class="progress-bar" style="width: 0%"></div>
                 </div>
             </div>
-            
             <div id="questionText" class="question-text">جاري تحميل السؤال...</div>
-            
-            <div id="optionsContainer" class="options">
-                <!-- الخيارات ستظهر هنا -->
-            </div>
-
+            <div id="optionsContainer" class="options"></div>
             <div class="nav-buttons">
                 <button id="prevBtn" class="nav-btn" onclick="previousQuestion()" disabled>⬅️ السابق</button>
                 <button id="nextBtn" class="nav-btn" onclick="nextQuestion()">التالي ➡️</button>
             </div>
         </div>
 
-        <!-- منطقة النتيجة -->
         <div id="resultArea" class="result-area hidden">
             <div class="score-card">
                 <h2>نتيجتك في الاختبار</h2>
@@ -559,286 +603,16 @@
                 <p id="percentageDisplay">0%</p>
                 <p style="font-size: 1.2em;">﴿ فَمَنْ يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ ﴾</p>
             </div>
-
             <h3 style="margin-bottom: 20px; color: #0f4e3a;">تفاصيل الإجابات:</h3>
             <div id="detailsContainer"></div>
-
             <button class="back-btn" onclick="backToMenu()">العودة للقائمة الرئيسية</button>
         </div>
 
-        <!-- تذييل -->
         <div class="footer-text">
             <span>✿</span> بسم الله الرحمن الرحيم <span>✿</span>
         </div>
     </div>
 
-    <script>
-        // قاعدة البيانات: جميع الأسئلة من الوحدات الأربع
-        const allQuestions = {
-            1: [ // الوحدة الأولى
-                { question: "كم عدد آيات سورة البقرة؟", options: ["284 آية", "285 آية", "286 آية", "287 آية"], answer: 2 },
-                { question: "أي مما يأتي يُعد مثالاً على 'دليل الهداية' لوجود الله تعالى؟", options: ["دوران الأرض حول الشمس", "اهتداء الطفل للرضاعة ساعة ولادته", "تكوين جسم الإنسان", "تعاقب الليل والنهار"], answer: 1 },
-                { question: "ما المقصود بـ 'الفطرة'؟", options: ["القوانين العلمية في الكون", "الطبيعة السليمة التي خلق الله الناس عليها", "التفكير العقلي المحض", "اتباع ما وجدنا عليه آباءنا"], answer: 1 },
-                { question: "أي من مراحل التحدي بالقرآن الكريم كانت الأخيرة؟", options: ["التحدي بالقرآن كاملاً", "التحدي بعشر سور", "التحدي بسورة واحدة", "التحدي بآية واحدة"], answer: 2 },
-                { question: "ما هو 'الاجتهاد' في الاصطلاح الشرعي؟", options: ["بذل الفقيه وسعه لاستنباط الأحكام الشرعية العملية", "حفظ القرآن الكريم والسنة", "تقليد آراء العلماء السابقين", "العمل الصالح في رمضان"], answer: 0 },
-                { question: "تقع مسؤولية تغيير المنكر 'بالقلب' على:", options: ["الحاكم فقط", "أهل العلم فقط", "جميع المسلمين", "الرجال دون النساء"], answer: 2 },
-                { question: "من آثار الإيمان باليوم الآخر في حياة المسلم:", options: ["السعي لطلب المال بشتى الطرق", "الاستقامة في العمل والتزام الصلاح", "إهمال عمارة الأرض", "كثرة الجدال مع الآخرين"], answer: 1 },
-                { question: "جميع السور الآتية من 'السبع الطوال' ما عدا سورة:", options: ["البقرة", "النساء", "الرعد", "المائدة"], answer: 2 },
-                { question: "تظهر سعة علم الله تعالى في قوله سبحانه:", options: ["﴿لِلَّهِ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ﴾", "﴿لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا﴾", "﴿قُلْ إِنَّمَا الْعِلْمُ عِنْدَ اللَّهِ﴾", "﴿إِنَّ اللَّهَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ﴾"], answer: 2 },
-                { question: "لماذا قُدم ذكر الإيمان بالملائكة على الكتب والرسل في الآية؟", options: ["لأن الملائكة أفضل من البشر", "لأن الملك هو الذي ينزل بالوحي على الرسول", "لأن عددهم أكثر", "لا توجد حكمة محددة"], answer: 1 },
-                { question: "ما حكم الاجتهاد بالنسبة لعلماء المسلمين في كل عصر؟", options: ["مندوب", "مباح", "واجب", "مكروه"], answer: 2 },
-                { question: "أي من المسائل الآتية لا يجوز فيها الاجتهاد؟", options: ["كيفية الصلاة في الطائرة", "عدد ركعات الصلوات المفروضة", "أطفال الأنابيب", "عمليات زراعة الأعضاء"], answer: 1 },
-                { question: "أين يقع مقر مجمع الفقه الإسلامي الدولي؟", options: ["عمان", "القاهرة", "جدة", "مكة المكرمة"], answer: 2 },
-                { question: "ما حكم التبرع بالأعضاء البشرية أثناء حياة المتبرع بشرط عدم الضرر؟", options: ["حرام", "مكروه", "جائز", "واجب"], answer: 2 },
-                { question: "ما حكم بيع الأعضاء البشرية في الإسلام؟", options: ["جائز للحاجة", "حرام", "مندوب", "مباح"], answer: 1 },
-                { question: "الدليل الذي يقوم على أن لكل معلول علة ولكل حادث محدثاً هو:", options: ["دليل الإتقان", "دليل الهداية", "دليل السببية", "الدليل النقلي"], answer: 2 },
-                { question: "معنى كلمة 'غفرانك' في سورة البقرة هو:", options: ["طلب الرزق", "طلب المسامحة وترك المعاقبة على الذنب", "شكر الله", "طلب العلم"], answer: 1 },
-                { question: "تقع مسؤولية تغيير المنكر 'باليد' على:", options: ["كل فرد في المجتمع", "أصحاب السلطة", "الأطفال", "كبار السن فقط"], answer: 1 },
-                { question: "الحدث المرتبط بالنفخة الأولى في الصور هو:", options: ["بعث الناس من القبور", "تطاير الصحف", "تناثر النجوم واختلال نظام الكون", "الورود على الحوض"], answer: 2 },
-                { question: "المكان الذي يجمع الله فيه الناس يوم القيامة يُسمى:", options: ["البرزخ", "المحشر", "الجنة", "الفردوس"], answer: 1 }
-            ],
-            2: [ // الوحدة الثانية
-                { question: "سورة الأعراف هي سورة:", options: ["مدنية", "مكية", "نصفها مكي ونصفها مدني", "نزلت في السفر"], answer: 1 },
-                { question: "ما هو 'الأعراف'؟", options: ["اسم للجبال في الدنيا", "مكان بين الجنة والنار يوجد فيه ناس تساوت حسناتهم وسيئاتهم", "وادٍ في جهنم", "باب من أبواب الجنة"], answer: 1 },
-                { question: "ما حكم الأكل والشرب في قوله تعالى ﴿وكُلُوا وَاشْرَبُوا﴾؟", options: ["واجب", "مندوب", "مباح", "مكروه"], answer: 2 },
-                { question: "يُطلق لفظ 'الفواحش' على:", options: ["الصغائر من الذنوب", "ما عظم قبحه من أفعال وأقوال كالزنا", "اللغو في الكلام", "الإسراف في الطعام"], answer: 1 },
-                { question: "من هو الخليفة الذي أمر العلماء رسمياً بجمع السنة النبوية؟", options: ["أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "عمر بن عبد العزيز"], answer: 3 },
-                { question: "من هو صاحب كتاب 'المسند'؟", options: ["الإمام البخاري", "الإمام مسلم", "الإمام أحمد بن حنبل", "الإمام الترمذي"], answer: 2 },
-                { question: "أول مصنّف في الحديث النبوي الشريف هو:", options: ["صحيح البخاري", "موطأ الإمام مالك", "مسند أحمد", "سنن ابن ماجه"], answer: 1 },
-                { question: "وقعت غزوة تبوك في السنة:", options: ["الثامنة للهجرة", "التاسعة للهجرة", "العاشرة للهجرة", "الخامسة للهجرة"], answer: 1 },
-                { question: "سُمي جيش المسلمين في تبوك بـ:", options: ["جيش الفتح", "جيش العسرة", "جيش اليرموك", "جيش المهاجرين"], answer: 1 },
-                { question: "من هو أكثر الصحابة إنفاقاً على جيش تبوك؟", options: ["أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "علي بن طالب"], answer: 2 },
-                { question: "ما السبب المباشر ليوم تبوك؟", options: ["رغبة المسلمين في التجارة", "علم النبي بتجهز الروم للهجوم على المدينة", "فتح مكة", "الدفاع عن اليمن"], answer: 1 },
-                { question: "ما حكم ممارسة المرأة للحقوق السياسية في الإسلام؟", options: ["حرام", "جائزة كالرجل سواء بسواء", "مكروهة", "واجبة في كل وقت"], answer: 1 },
-                { question: "من هي الصحابية التي قاتلت دفاعاً عن النبي في يوم أحد؟", options: ["أم سلمة", "أم عمارة (نسيبة المازنية)", "أم سليم", "أم منيع"], answer: 1 },
-                { question: "من أوائل الصحابيات اللواتي هاجرن إلى الحبشة:", options: ["السيدة حفصة", "السيدة رقية بنت النبي", "السيدة أسماء", "السيدة زينب"], answer: 1 },
-                { question: "حق المرأة في تقديم النصيحة لولي الأمر يُعد تطبيقاً لمبدأ:", options: ["الشورى", "الأمر بالمعروف والنهي عن المنكر", "المساواة", "الجهاد"], answer: 1 },
-                { question: "من هو الصحابي الذي أرسله النبي بمارة إلى ملكي عُمان؟", options: ["دحية الكلبي", "عمرو بن العاص", "حاطب بن أبي بلتعة", "العلاء الحضرمي"], answer: 1 },
-                { question: "الملك الذي مزّق رسالة النبي فدعا عليه النبي بزوال ملكه هو:", options: ["هرقل عظيم الروم", "كسرى ملك الفرس", "المقوقس عظيم القبط", "النجاشي ملك الحبشة"], answer: 1 },
-                { question: "الرسول الذي قُتل قبل إيصاله رسالة النبي هو الصحابي:", options: ["الحارث بن عمير الأزدي", "عمرو الضمري", "دحية الكلبي", "عبد الله بن حذافة"], answer: 0 },
-                { question: "الواقعة التي تفرغ النبي بعدها لمكاتبة الملوك والزعماء هي:", options: ["غزوة خيبر", "صلح الحديبية", "فتح مكة", "غزوة حنين"], answer: 1 },
-                { question: "'الأريسيون' المذكورون في رسالة النبي لهرقل هم:", options: ["الفرس", "أتباع هرقل من الفلاحين أو عامة الناس", "المشركون", "المنافقون"], answer: 1 }
-            ],
-            3: [ // الوحدة الثالثة
-                { question: "تشير الآية ﴿وإن امرأة خافت من بعلها نشوزاً...﴾ إلى وسيلة لتجنب الطلاق وهي:", options: ["التحكيم", "الإصلاح والتصالح بين الزوجين", "الهجر", "الضرب غير المبرح"], answer: 1 },
-                { question: "ما هو 'الطلاق' في الشريعة الإسلامية؟", options: ["إنهاء عقد الزواج بلفظ مخصوص", "السفر وترك الزوجة", "الامتناع عن النفقة", "الشجار الدائم بين الزوجين"], answer: 0 },
-                { question: "ما حكم الطلاق في حال عدم وجود دوافع أو أسباب ضرورية؟", options: ["مباح", "مكروه", "واجب", "مندوب"], answer: 1 },
-                { question: "الطلاق الذي يوقعه الزوج لأول مرة ولم ينتهِ بالعدة يُسمى طلاقاً:", options: ["بائناً بينونة كبرى", "رجعياً", "بائناً بينونة صغرى", "طلاقاً تعسفياً"], answer: 1 },
-                { question: "عدة المرأة الحامل المطلقة أو المتوفى عنها زوجها تنتهي بـ:", options: ["ثلاثة قروء", "بوضع الحمل", "أربعة أشهر وعشرة أيام", "سنة كاملة"], answer: 1 },
-                { question: "عدة المرأة المتوفى عنها زوجها (غير الحامل) هي:", options: ["ثلاثة قروء", "ثلاثة أشهر قمرية", "أربعة أشهر وعشرة أيام", "شهر واحد"], answer: 2 },
-                { question: "ما معنى 'قروء' في قوله تعالى ﴿ثلاثة قروء﴾؟", options: ["سنوات", "حيضات", "شهور", "أيام"], answer: 1 },
-                { question: "حكم 'الحداد' للمرأة المتوفى عنها زوجها في العدة هو:", options: ["مندوب", "مباح", "واجب", "مكروه"], answer: 2 },
-                { question: "المطلقة قبل الدخول بها (غير الحامل):", options: ["عدتها ثلاثة قروء", "لا عدة عليها", "عدتها أربعة أشهر وعشرة أيام", "عدتها شهر واحد"], answer: 1 },
-                { question: "ما هي 'الوصية'؟", options: ["تبرع بالمال للأبناء فقط", "تصرف في التركة مضاف إلى ما بعد الموت", "بيع العقارات للأقارب", "تسديد الديون في حياة الشخص"], answer: 1 },
-                { question: "الحد الأقصى لمقدار الوصية من المال هو:", options: ["النصف", "الثلث", "الربع", "كل المال"], answer: 1 },
-                { question: "ما حكم الوصية لـ 'وارث' (أحد الأبناء مثلاً)؟", options: ["جائزة دائماً", "لا تجوز (لا وصية لوارث)", "واجبة", "مندوبة"], answer: 1 },
-                { question: "ما هو 'الميراث'؟", options: ["انتقال ملكية أموال المتوفى وحقوقه لورثته", "الصدقة الجارية", "كتابة الوصية قبل الموت", "توزيع المال في حياة الأب"], answer: 0 },
-                { question: "من موانع الميراث في الإسلام:", options: ["الفقر", "السفر", "القتل العمد للمورِّث", "كبر السن"], answer: 2 },
-                { question: "متى ترث البنت 'النصف' من تركة أبيها؟", options: ["إذا كانت معها أخوات أخريات", "إذا كانت وحيدة وليس لها إخوة ذكور", "إذا كان معها أخ ذكر", "في كل الحالات"], answer: 1 },
-                { question: "ما المقصود بـ 'الوسطية'؟", options: ["إهمال الدين والتركيز على الدنيا", "التوازن والاعتدال والشمول والواقعية", "التشدد في كل الأمور", "التراخي في أداء الواجبات"], answer: 1 },
-                { question: "التشدد في أداء الأعمال بما يتجاوز الحد الذي أقره الشرع يُسمى:", options: ["تفريطاً", "إفراطاً", "تمسكاً", "تهاوناً"], answer: 1 },
-                { question: "ما هو 'الوقف'؟", options: ["حبس العين والتصدق بمنفعتها", "بيع الأرض للفقراء", "الوصية بالمال للأبناء", "تسديد ديون الناس"], answer: 0 },
-                { question: "المدرسة الصالحية في القدس أنشأها السلطان:", options: ["نور الدين زنكي", "صلاح الدين الأيوبي", "المنصور قالوون", "العز بن عبد السلام"], answer: 1 },
-                { question: "أُنشئت وقفية الإمام الرازي في عهد الملك:", options: ["عبد الله الثاني حفظه الله", "الحسين بن طلال رحمه الله", "طلال بن عبد الله", "عبد الله الأول"], answer: 1 }
-            ],
-            4: [ // الوحدة الرابعة
-                { question: "من هو 'المفلس' الحقيقي يوم القيامة حسب الحديث الشريف؟", options: ["من لا يملك درهماً ولا متاعاً", "من يأتي بحسنات كثيرة لكنه اعتدى على حقوق الآخرين فتذهب حسناته لهم", "من لا يصلي ولا يصوم", "من خسر تجارته في الدنيا"], answer: 1 },
-                { question: "راوي حديث 'أتدرون من المفلس؟' هو الصحابي:", options: ["أنس بن مالك", "أبو هريرة", "عبد الله بن عمر", "عبد الله بن عباس"], answer: 1 },
-                { question: "ما هو المقصد الأساسي للشريعة الإسلامية؟", options: ["جمع المال", "تحقيق مصالح الناس وحماية الضروريات الخمس", "فرض العقوبات فقط", "منع السفر"], answer: 1 },
-                { question: "حفظ 'الدين' يكون من خلال:", options: ["القصاص", "الدعوة إلى الله والاجتهاد والأمر بالمعروف", "تحريم الربا", "تحريم الزنا"], answer: 1 },
-                { question: "حفظ 'المال' يكون من خلال:", options: ["الصلاة والزكاة", "تحريم السرقة والربا وتوثيق المعاملات", "الأمر بالمعروف والنهي عن المنكر", "تحريم الخمر"], answer: 1 },
-                { question: "أعلى مرتبة في مقاصد الشريعة هي:", options: ["التحسينيات", "الحاجيات", "الضروريات", "الكماليات"], answer: 2 },
-                { question: "من الأمثلة على 'الحاجيات' في الشريعة:", options: ["إباحة الإفطار في رمضان للمسافر", "تحريم القتل", "أخذ الزينة عند كل مسجد", "تحريم الشرك"], answer: 0 },
-                { question: "حفظ 'العقل' يتم من خلال:", options: ["طلب العلم وتحريم الخمر والمخدرات", "ممارسة الرياضة", "الزواج", "كسب المال"], answer: 0 },
-                { question: "حفظ 'النفس' يتم من خلال:", options: ["تحريم الغيبة", "مشروعية القصاص والدية وتحريم الانتحار", "الصدقة", "صلة الرحم"], answer: 1 },
-                { question: "حفظ 'النسل' يتم من خلال:", options: ["طلب الرزق", "تشريع الزواج وتحريم الزنا والقذف", "بناء المساجد", "صوم رمضان"], answer: 1 },
-                { question: "ما المقصود بـ 'الجريمة'؟", options: ["كل عمل يساء فهمه", "فعل أو ترك لفعل قرر الشرع له عقوبة", "السفر من دون إذن", "الاختلاف في الرأي"], answer: 1 },
-                { question: "عقوبة 'السرقة' تُصنف ضمن جرائم:", options: ["القصاص", "الحدود", "التعزير", "الدية"], answer: 1 },
-                { question: "من تقع عليه مسؤولية تنفيذ العقوبات في الدولة؟", options: ["كل فرد في المجتمع", "ولي الأمر أو من ينوب عنه من القضاة", "المجني عليه نفسه", "شيوخ العشائر فقط"], answer: 1 },
-                { question: "في أي سنة هجرية كانت 'حجة الوداع'؟", options: ["الثامنة", "التاسعة", "العاشرة", "السادسة"], answer: 2 },
-                { question: "من أسامي حجة الوداع أيضاً:", options: ["حجة النصر", "حجة البلاغ", "حجة الفتح", "حجة الهجرة"], answer: 1 },
-                { question: "أوصى النبي في حجة الوداع بـ:", options: ["التقوى والاعتصام بالكتاب والسنة والرفق بالنساء", "كثرة التجارة", "ترك المدينة والعيش في مكة", "اعتزال الناس"], answer: 0 },
-                { question: "ما معنى 'التقوى'؟", options: ["القوة البدنية", "مخافة الله تعالى والتزام أوامره واجتناب نواهيه", "حفظ الشعر العربي", "كسب المال الوفير"], answer: 1 },
-                { question: "ما المقصود بـ 'المسؤولية المجتمعية'؟", options: ["عمل الفرد لمصلحته الشخصية فقط", "قيام أفراد المجتمع بواجباتهم لتحقيق النفع العام", "انتظار المساعدة من الآخرين", "عزل النفس عن مشاكل المجتمع"], answer: 1 },
-                { question: "حقوق الإنسان في الإسلام هي حقوق:", options: ["مكتسبة من القوانين الوضعية", "منح إلهية لا يجوز الاعتداء عليها", "قابلة للتغيير حسب الزمان", "خاصة بالمسلمين فقط"], answer: 1 },
-                { question: "يشير قوله تعالى ﴿لَا إِكْرَاهَ فِي الدِّينِ﴾ إلى حق:", options: ["الحياة", "التملك", "التدين (حرية الاعتقاد)", "التعليم"], answer: 2 }
-            ]
-        };
-
-        // متغيرات التطبيق
-        let currentQuiz = {
-            questions: [],
-            userAnswers: [],
-            currentIndex: 0,
-            totalQuestions: 0
-        };
-
-        let currentUnit = null;
-
-        // عناصر DOM
-        const mainMenu = document.getElementById('mainMenu');
-        const quizArea = document.getElementById('quizArea');
-        const resultArea = document.getElementById('resultArea');
-        const questionText = document.getElementById('questionText');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const prevBtn = document.getElementById('prevBtn');
-        const questionCounter = document.getElementById('questionCounter');
-        const progressBar = document.getElementById('progressBar');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const percentageDisplay = document.getElementById('percentageDisplay');
-        const detailsContainer = document.getElementById('detailsContainer');
-
-        // بدء الامتحان
-        window.startQuiz = function(unit) {
-            currentUnit = unit;
-            
-            // تجهيز الأسئلة
-            if (unit === 'final') {
-                // الامتحان الشامل: خلط 50 سؤال من جميع الوحدات
-                let allUnitQuestions = [];
-                for (let i = 1; i <= 4; i++) {
-                    allUnitQuestions = allUnitQuestions.concat(allQuestions[i]);
-                }
-                // خلط الأسئلة
-                currentQuiz.questions = shuffleArray(allUnitQuestions).slice(0, 50);
-            } else {
-                // وحدة محددة: نسخ الأسئلة
-                currentQuiz.questions = [...allQuestions[unit]];
-            }
-
-            currentQuiz.totalQuestions = currentQuiz.questions.length;
-            currentQuiz.userAnswers = new Array(currentQuiz.totalQuestions).fill(null);
-            currentQuiz.currentIndex = 0;
-
-            // إخفاء وإظهار العناصر
-            mainMenu.classList.add('hidden');
-            quizArea.classList.remove('hidden');
-            resultArea.classList.add('hidden');
-
-            // عرض أول سؤال
-            displayQuestion();
-            updateNavButtons();
-        };
-
-        // خلط المصفوفة (للفلاش)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        // عرض السؤال الحالي
-        function displayQuestion() {
-            const q = currentQuiz.questions[currentQuiz.currentIndex];
-            questionText.textContent = q.question;
-
-            // إنشاء خيارات
-            let optionsHtml = '';
-            q.options.forEach((opt, index) => {
-                const isSelected = currentQuiz.userAnswers[currentQuiz.currentIndex] === index;
-                optionsHtml += `<div class="option ${isSelected ? 'selected' : ''}" onclick="selectOption(${index})">${opt}</div>`;
-            });
-            optionsContainer.innerHTML = optionsHtml;
-
-            // تحديث العداد وشريط التقدم
-            questionCounter.textContent = `سؤال ${currentQuiz.currentIndex + 1}/${currentQuiz.totalQuestions}`;
-            progressBar.style.width = `${((currentQuiz.currentIndex + 1) / currentQuiz.totalQuestions) * 100}%`;
-        }
-
-        // اختيار إجابة
-        window.selectOption = function(optionIndex) {
-            // حفظ الإجابة
-            currentQuiz.userAnswers[currentQuiz.currentIndex] = optionIndex;
-
-            // تحديث شكل الخيارات
-            const options = document.querySelectorAll('.option');
-            options.forEach((opt, idx) => {
-                if (idx === optionIndex) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-
-            // الانتقال التلقائي للسؤال التالي إذا لم يكن الأخير
-            if (currentQuiz.currentIndex < currentQuiz.totalQuestions - 1) {
-                setTimeout(() => {
-                    nextQuestion();
-                }, 300);
-            }
-        };
-
-        // السؤال التالي
-        window.nextQuestion = function() {
-            if (currentQuiz.currentIndex < currentQuiz.totalQuestions - 1) {
-                currentQuiz.currentIndex++;
-                displayQuestion();
-                updateNavButtons();
-            } else {
-                // إذا كان هذا هو آخر سؤال، نعرض النتيجة
-                showResults();
-            }
-        };
-
-        // السؤال السابق
-        window.previousQuestion = function() {
-            if (currentQuiz.currentIndex > 0) {
-                currentQuiz.currentIndex--;
-                displayQuestion();
-                updateNavButtons();
-            }
-        };
-
-        // تحديث حالة أزرار التنقل
-        function updateNavButtons() {
-            prevBtn.disabled = currentQuiz.currentIndex === 0;
-        }
-
-        // عرض النتائج
-        function showResults() {
-            // حساب النتيجة
-            let score = 0;
-            currentQuiz.questions.forEach((q, index) => {
-                if (currentQuiz.userAnswers[index] === q.answer) {
-                    score++;
-                }
-            });
-
-            // إخفاء منطقة الامتحان وإظهار النتيجة
-            quizArea.classList.add('hidden');
-            resultArea.classList.remove('hidden');
-
-            // عرض النتيجة الإجمالية
-            scoreDisplay.textContent = `${score}/${currentQuiz.totalQuestions}`;
-            const percentage = Math.round((score / currentQuiz.totalQuestions) * 100);
-            percentageDisplay.textContent = `${percentage}%`;
-
-            // عرض التفاصيل
-            let detailsHtml = '<table class="details-table"><tr><th>السؤال</th><th>إجابتك</th><th>الإجابة الصحيحة</th></tr>';
-            currentQuiz.questions.forEach((q, index) => {
-                const userAns = currentQuiz.userAnswers[index];
-                const userAnsText = userAns !== null ? q.options[userAns] : 'لم تجب';
-                const correctAnsText = q.options[q.answer];
-                const isCorrect = userAns === q.answer;
-
-                detailsHtml += `<tr>
-                    <td>${q.question}</td>
-                    <td class="${isCorrect ? 'correct-answer' : 'wrong-answer'}">${userAnsText}</td>
-                    <td class="correct-answer">${correctAnsText}</td>
-                </tr>`;
-            });
-            detailsHtml += '</table>';
-            detailsContainer.innerHTML = detailsHtml;
-        }
-
-        // العودة للقائمة الرئيسية
-        window.backToMenu = function() {
-            mainMenu.classList.remove('hidden');
-            quizArea.classList.add('hidden');
-            resultArea.classList.add('hidden');
-        };
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
