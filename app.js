@@ -15,7 +15,7 @@ let mainMenu, quizArea, resultArea, questionText, optionsContainer;
 let prevBtn, nextBtn, questionCounter, progressBar;
 let scoreDisplay, percentageDisplay, detailsContainer;
 
-// دالة لتهيئة العناصر بعد تحميل الصفحة
+// دالة لتهيئة العناصر
 function initElements() {
     mainMenu = document.getElementById('mainMenu');
     quizArea = document.getElementById('quizArea');
@@ -30,19 +30,26 @@ function initElements() {
     percentageDisplay = document.getElementById('percentageDisplay');
     detailsContainer = document.getElementById('detailsContainer');
     
-    console.log('العناصر تم تهيئتها:', {
-        mainMenu: !!mainMenu,
-        quizArea: !!quizArea,
-        resultArea: !!resultArea
+    console.log('العناصر بعد التهيئة:', {
+        mainMenu: mainMenu ? 'موجود' : 'غير موجود',
+        quizArea: quizArea ? 'موجود' : 'غير موجود',
+        resultArea: resultArea ? 'موجود' : 'غير موجود'
     });
 }
 
 // انتظار تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM جاهز');
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM جاهز');
+        initElements();
+        loadQuestions();
+    });
+} else {
+    // DOM جاهز بالفعل
+    console.log('DOM جاهز (مباشر)');
     initElements();
     loadQuestions();
-});
+}
 
 async function loadQuestions() {
     if (allQuestionsData) return allQuestionsData;
@@ -144,11 +151,23 @@ window.loadFinalExam = async function() {
 function startQuiz() {
     console.log('بدء الامتحان');
     
-    // تأكد من وجود العناصر
+    // تأكد من وجود العناصر مرة ثانية
     if (!mainMenu || !quizArea || !resultArea) {
         initElements();
     }
     
+    // إخفاء القائمة وإظهار منطقة الامتحان
+    if (mainMenu) {
+        mainMenu.style.display = 'none';
+    }
+    if (quizArea) {
+        quizArea.style.display = 'block';
+    }
+    if (resultArea) {
+        resultArea.style.display = 'none';
+    }
+    
+    // إزالة كلاس hidden من العناصر
     if (mainMenu) mainMenu.classList.add('hidden');
     if (quizArea) quizArea.classList.remove('hidden');
     if (resultArea) resultArea.classList.add('hidden');
@@ -159,6 +178,8 @@ function startQuiz() {
 }
 
 function displayQuestion() {
+    if (!currentQuiz.questions.length) return;
+    
     const q = currentQuiz.questions[currentQuiz.currentIndex];
     if (!q) return;
     
@@ -174,8 +195,10 @@ function displayQuestion() {
     if (questionCounter) {
         questionCounter.textContent = `سؤال ${currentQuiz.currentIndex + 1}/${currentQuiz.totalQuestions}`;
     }
-    const progressPercent = ((currentQuiz.currentIndex + 1) / currentQuiz.totalQuestions) * 100;
-    if (progressBar) progressBar.style.width = `${progressPercent}%`;
+    if (progressBar) {
+        const progressPercent = ((currentQuiz.currentIndex + 1) / currentQuiz.totalQuestions) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+    }
 }
 
 window.selectOption = function(optionIndex) {
@@ -234,7 +257,7 @@ function showResults() {
     const percentage = Math.round((score / currentQuiz.totalQuestions) * 100);
     if (percentageDisplay) percentageDisplay.textContent = `${percentage}%`;
     
-    let detailsHtml = '<table class="details-table"><thead><tr><th>السؤال</th><th>إجابتك</th><th>الإجابة الصحيحة</th></thead><tbody>';
+    let detailsHtml = '<table class="details-table"><thead><tr><th>السؤال</th><th>إجابتك</th><th>الإجابة الصحيحة</th></tr></thead><tbody>';
     
     currentQuiz.questions.forEach((q, index) => {
         const userAns = currentQuiz.userAnswers[index];
