@@ -2,162 +2,58 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>نور الدين - امتحانات تفاعلية</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container" id="app">
+        <div class="header">
+            <h1>📖 <span>نور</span> الدين <span>✨</span></h1>
+            <p>وَ قُلْ رَبِّ زِدْنِي عِلْمًا</p>
+            <div class="islamic-pattern"></div>
+        </div>
 
-    <script>
-        // فحص إذا كانت الملفات المطلوبة موجودة
-        async function checkFiles() {
-            try {
-                // محاولة تحميل CSS
-                const cssResponse = await fetch('style.css');
-                if (!cssResponse.ok) throw new Error('CSS missing');
-                
-                // محاولة تحميل الأسئلة
-                const jsonResponse = await fetch('questions.json');
-                if (!jsonResponse.ok) throw new Error('JSON missing');
-                
-                // محاولة تحميل JavaScript
-                const jsResponse = await fetch('app.js');
-                if (!jsResponse.ok) throw new Error('JS missing');
-                
-                // إذا كلشي موجود، حمّل الموقع
-                loadWebsite();
-            } catch (error) {
-                // إذا ناقص ملف، اعرض رسالة السارق
-                showThiefMessage();
-            }
-        }
-        
-        function showThiefMessage() {
-            document.body.innerHTML = `
-                <div style="
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
-                    font-family: 'Courier New', monospace;
-                    text-align: center;
-                    padding: 20px;
-                ">
-                    <div style="
-                        background: #000;
-                        border: 5px solid #ff0000;
-                        border-radius: 30px;
-                        padding: 50px;
-                        max-width: 600px;
-                        box-shadow: 0 0 50px rgba(255,0,0,0.3);
-                        animation: shake 0.5s ease-in-out;
-                    ">
-                        <h1 style="
-                            font-size: 4em;
-                            color: #ff0000;
-                            margin-bottom: 20px;
-                            text-shadow: 0 0 10px rgba(255,0,0,0.5);
-                        ">😂😂😂</h1>
-                        <h2 style="
-                            font-size: 2.5em;
-                            color: #ff6666;
-                            margin-bottom: 30px;
-                        ">هههههههههههههههه</h2>
-                        <p style="
-                            font-size: 1.5em;
-                            color: #ff9999;
-                            margin-bottom: 20px;
-                            line-height: 1.8;
-                        ">
-                            مفكر حالك قوي؟ 😏<br>
-                            بتحاول تسرق الموقع؟ 🚫
-                        </p>
-                        <p style="
-                            font-size: 1.8em;
-                            color: #ff3333;
-                            margin-top: 30px;
-                            font-weight: bold;
-                        ">
-                            أقول ارجع وراك يا حبيبي! 🤣
-                        </p>
-                    </div>
+        <div id="mainMenu" class="main-menu">
+            <button class="menu-btn" onclick="loadUnit(1)">الوحدة الأولى</button>
+            <button class="menu-btn" onclick="loadUnit(2)">الوحدة الثانية</button>
+            <button class="menu-btn" onclick="loadUnit(3)">الوحدة الثالثة</button>
+            <button class="menu-btn" onclick="loadUnit(4)">الوحدة الرابعة</button>
+            <button class="menu-btn special" onclick="loadFinalExam()">📝 الامتحان الشامل</button>
+        </div>
+
+        <div id="quizArea" class="quiz-area hidden">
+            <div class="question-header">
+                <span id="questionCounter">سؤال 1/20</span>
+                <div class="progress">
+                    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
                 </div>
-                <style>
-                    @keyframes shake {
-                        0%, 100% { transform: translateX(0); }
-                        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                        20%, 40%, 60%, 80% { transform: translateX(5px); }
-                    }
-                </style>
-            `;
-        }
-        
-        function loadWebsite() {
-            // إضافة الـ CSS
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'style.css';
-            document.head.appendChild(link);
-            
-            // إضافة الـ HTML الرئيسي
-            document.getElementById('root').innerHTML = `
-                <div class="container" id="app">
-                    <div class="header">
-                        <h1>📖 <span>نور</span> الدين <span>✨</span></h1>
-                        <p>وَ قُلْ رَبِّ زِدْنِي عِلْمًا</p>
-                        <div class="islamic-pattern"></div>
-                    </div>
+            </div>
+            <div id="questionText" class="question-text">جاري تحميل السؤال...</div>
+            <div id="optionsContainer" class="options"></div>
+            <div class="nav-buttons">
+                <button id="prevBtn" class="nav-btn" onclick="previousQuestion()" disabled>⬅️ السابق</button>
+                <button id="nextBtn" class="nav-btn" onclick="nextQuestion()">التالي ➡️</button>
+            </div>
+        </div>
 
-                    <div id="mainMenu" class="main-menu">
-                        <button class="menu-btn" onclick="window.loadUnit(1)">الوحدة الأولى</button>
-                        <button class="menu-btn" onclick="window.loadUnit(2)">الوحدة الثانية</button>
-                        <button class="menu-btn" onclick="window.loadUnit(3)">الوحدة الثالثة</button>
-                        <button class="menu-btn" onclick="window.loadUnit(4)">الوحدة الرابعة</button>
-                        <button class="menu-btn special" onclick="window.loadFinalExam()">📝 الامتحان الشامل</button>
-                    </div>
+        <div id="resultArea" class="result-area hidden">
+            <div class="score-card">
+                <h2>نتيجتك في الاختبار</h2>
+                <div id="scoreDisplay" class="score">0/0</div>
+                <p id="percentageDisplay">0%</p>
+                <p style="font-size: 1.2em;">﴿ فَمَنْ يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ ﴾</p>
+            </div>
+            <h3 style="margin-bottom: 20px; color: #0f4e3a;">تفاصيل الإجابات:</h3>
+            <div id="detailsContainer"></div>
+            <button class="back-btn" onclick="backToMenu()">العودة للقائمة الرئيسية</button>
+        </div>
 
-                    <div id="quizArea" class="quiz-area hidden">
-                        <div class="question-header">
-                            <span id="questionCounter">سؤال 1/20</span>
-                            <div class="progress">
-                                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div id="questionText" class="question-text">جاري تحميل السؤال...</div>
-                        <div id="optionsContainer" class="options"></div>
-                        <div class="nav-buttons">
-                            <button id="prevBtn" class="nav-btn" onclick="window.previousQuestion()" disabled>⬅️ السابق</button>
-                            <button id="nextBtn" class="nav-btn" onclick="window.nextQuestion()">التالي ➡️</button>
-                        </div>
-                    </div>
+        <div class="footer-text">
+            <span>✿</span> بسم الله الرحمن الرحيم <span>✿</span>
+        </div>
+    </div>
 
-                    <div id="resultArea" class="result-area hidden">
-                        <div class="score-card">
-                            <h2>نتيجتك في الاختبار</h2>
-                            <div id="scoreDisplay" class="score">0/0</div>
-                            <p id="percentageDisplay">0%</p>
-                            <p style="font-size: 1.2em;">﴿ فَمَنْ يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ ﴾</p>
-                        </div>
-                        <h3 style="margin-bottom: 20px; color: #0f4e3a;">تفاصيل الإجابات:</h3>
-                        <div id="detailsContainer"></div>
-                        <button class="back-btn" onclick="window.backToMenu()">العودة للقائمة الرئيسية</button>
-                    </div>
-
-                    <div class="footer-text">
-                        <span>✿</span> بسم الله الرحمن الرحيم <span>✿</span>
-                    </div>
-                </div>
-            `;
-            
-            // تحميل ملف الـ JavaScript الرئيسي
-            const script = document.createElement('script');
-            script.src = 'app.js';
-            document.body.appendChild(script);
-        }
-        
-        // تشغيل الفحص
-        checkFiles();
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
