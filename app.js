@@ -15,11 +15,8 @@ let mainMenu, quizArea, resultArea, questionText, optionsContainer;
 let prevBtn, nextBtn, questionCounter, progressBar;
 let scoreDisplay, percentageDisplay, detailsContainer;
 
-// انتظار تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM جاهز');
-    
-    // تهيئة العناصر
+// دالة لتهيئة العناصر بعد تحميل الصفحة
+function initElements() {
     mainMenu = document.getElementById('mainMenu');
     quizArea = document.getElementById('quizArea');
     resultArea = document.getElementById('resultArea');
@@ -33,7 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
     percentageDisplay = document.getElementById('percentageDisplay');
     detailsContainer = document.getElementById('detailsContainer');
     
-    // تحميل الأسئلة
+    console.log('العناصر تم تهيئتها:', {
+        mainMenu: !!mainMenu,
+        quizArea: !!quizArea,
+        resultArea: !!resultArea
+    });
+}
+
+// انتظار تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM جاهز');
+    initElements();
     loadQuestions();
 });
 
@@ -55,8 +62,9 @@ async function loadQuestions() {
 }
 
 function showError(message) {
-    if (mainMenu) {
-        mainMenu.innerHTML = `
+    const mainMenuDiv = document.getElementById('mainMenu');
+    if (mainMenuDiv) {
+        mainMenuDiv.innerHTML = `
             <div style="text-align:center; padding:50px; background:#fff5e6; border-radius:30px; margin:20px;">
                 <p style="color:#8b1538; font-size:1.3em;">⚠️ ${message}</p>
                 <button onclick="location.reload()" style="margin-top:20px; padding:12px 30px; background:#0f4e3a; color:white; border:none; border-radius:30px; cursor:pointer;">إعادة تحميل</button>
@@ -77,6 +85,11 @@ window.loadUnit = async function(unitNumber) {
     console.log('تحميل الوحدة:', unitNumber);
     if (isLoading) return;
     isLoading = true;
+    
+    // تأكد من تهيئة العناصر
+    if (!mainMenu) {
+        initElements();
+    }
     
     const data = await loadQuestions();
     if (!data) {
@@ -104,6 +117,11 @@ window.loadFinalExam = async function() {
     if (isLoading) return;
     isLoading = true;
     
+    // تأكد من تهيئة العناصر
+    if (!mainMenu) {
+        initElements();
+    }
+    
     const data = await loadQuestions();
     if (!data) {
         isLoading = false;
@@ -124,9 +142,16 @@ window.loadFinalExam = async function() {
 };
 
 function startQuiz() {
-    mainMenu.classList.add('hidden');
-    quizArea.classList.remove('hidden');
-    resultArea.classList.add('hidden');
+    console.log('بدء الامتحان');
+    
+    // تأكد من وجود العناصر
+    if (!mainMenu || !quizArea || !resultArea) {
+        initElements();
+    }
+    
+    if (mainMenu) mainMenu.classList.add('hidden');
+    if (quizArea) quizArea.classList.remove('hidden');
+    if (resultArea) resultArea.classList.add('hidden');
     
     displayQuestion();
     updateNavButtons();
@@ -137,18 +162,20 @@ function displayQuestion() {
     const q = currentQuiz.questions[currentQuiz.currentIndex];
     if (!q) return;
     
-    questionText.textContent = q.question;
+    if (questionText) questionText.textContent = q.question;
     
     let optionsHtml = '';
     q.options.forEach((opt, index) => {
         const isSelected = currentQuiz.userAnswers[currentQuiz.currentIndex] === index;
         optionsHtml += `<div class="option ${isSelected ? 'selected' : ''}" onclick="selectOption(${index})">${opt}</div>`;
     });
-    optionsContainer.innerHTML = optionsHtml;
+    if (optionsContainer) optionsContainer.innerHTML = optionsHtml;
     
-    questionCounter.textContent = `سؤال ${currentQuiz.currentIndex + 1}/${currentQuiz.totalQuestions}`;
+    if (questionCounter) {
+        questionCounter.textContent = `سؤال ${currentQuiz.currentIndex + 1}/${currentQuiz.totalQuestions}`;
+    }
     const progressPercent = ((currentQuiz.currentIndex + 1) / currentQuiz.totalQuestions) * 100;
-    progressBar.style.width = `${progressPercent}%`;
+    if (progressBar) progressBar.style.width = `${progressPercent}%`;
 }
 
 window.selectOption = function(optionIndex) {
@@ -200,14 +227,14 @@ function showResults() {
         }
     });
     
-    quizArea.classList.add('hidden');
-    resultArea.classList.remove('hidden');
+    if (quizArea) quizArea.classList.add('hidden');
+    if (resultArea) resultArea.classList.remove('hidden');
     
-    scoreDisplay.textContent = `${score}/${currentQuiz.totalQuestions}`;
+    if (scoreDisplay) scoreDisplay.textContent = `${score}/${currentQuiz.totalQuestions}`;
     const percentage = Math.round((score / currentQuiz.totalQuestions) * 100);
-    percentageDisplay.textContent = `${percentage}%`;
+    if (percentageDisplay) percentageDisplay.textContent = `${percentage}%`;
     
-    let detailsHtml = '<table class="details-table"><thead><tr><th>السؤال</th><th>إجابتك</th><th>الإجابة الصحيحة</th></tr></thead><tbody>';
+    let detailsHtml = '<table class="details-table"><thead><tr><th>السؤال</th><th>إجابتك</th><th>الإجابة الصحيحة</th></thead><tbody>';
     
     currentQuiz.questions.forEach((q, index) => {
         const userAns = currentQuiz.userAnswers[index];
@@ -223,13 +250,13 @@ function showResults() {
     });
     
     detailsHtml += '</tbody></table>';
-    detailsContainer.innerHTML = detailsHtml;
+    if (detailsContainer) detailsContainer.innerHTML = detailsHtml;
 }
 
 window.backToMenu = function() {
-    mainMenu.classList.remove('hidden');
-    quizArea.classList.add('hidden');
-    resultArea.classList.add('hidden');
+    if (mainMenu) mainMenu.classList.remove('hidden');
+    if (quizArea) quizArea.classList.add('hidden');
+    if (resultArea) resultArea.classList.add('hidden');
     currentQuiz = {
         questions: [],
         userAnswers: [],
