@@ -1,4 +1,5 @@
-// app.js - الملف الرئيسي لإدارة الامتحان
+// app.js - الملف الرئيسي
+console.log('app.js تم تحميله بنجاح');
 
 let allQuestionsData = null;
 let currentQuiz = {
@@ -16,7 +17,9 @@ let scoreDisplay, percentageDisplay, detailsContainer;
 
 // انتظار تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    // تهيئة العناصر بعد تحميل HTML
+    console.log('DOM جاهز');
+    
+    // تهيئة العناصر
     mainMenu = document.getElementById('mainMenu');
     quizArea = document.getElementById('quizArea');
     resultArea = document.getElementById('resultArea');
@@ -38,13 +41,15 @@ async function loadQuestions() {
     if (allQuestionsData) return allQuestionsData;
     
     try {
+        console.log('جاري تحميل questions.json...');
         const response = await fetch('questions.json');
         if (!response.ok) throw new Error('فشل تحميل الأسئلة');
         allQuestionsData = await response.json();
+        console.log('تم تحميل الأسئلة بنجاح');
         return allQuestionsData;
     } catch (error) {
         console.error('خطأ:', error);
-        showError('حدث خطأ في تحميل الأسئلة');
+        showError('حدث خطأ في تحميل الأسئلة. تأكد من وجود ملف questions.json');
         return null;
     }
 }
@@ -52,9 +57,9 @@ async function loadQuestions() {
 function showError(message) {
     if (mainMenu) {
         mainMenu.innerHTML = `
-            <div style="text-align:center; padding:50px; color:#8b1538;">
-                <p>⚠️ ${message}</p>
-                <button onclick="location.reload()" style="margin-top:20px; padding:10px 30px; background:#0f4e3a; color:white; border:none; border-radius:30px;">إعادة تحميل</button>
+            <div style="text-align:center; padding:50px; background:#fff5e6; border-radius:30px; margin:20px;">
+                <p style="color:#8b1538; font-size:1.3em;">⚠️ ${message}</p>
+                <button onclick="location.reload()" style="margin-top:20px; padding:12px 30px; background:#0f4e3a; color:white; border:none; border-radius:30px; cursor:pointer;">إعادة تحميل</button>
             </div>
         `;
     }
@@ -69,6 +74,7 @@ function shuffleArray(array) {
 }
 
 window.loadUnit = async function(unitNumber) {
+    console.log('تحميل الوحدة:', unitNumber);
     if (isLoading) return;
     isLoading = true;
     
@@ -80,6 +86,7 @@ window.loadUnit = async function(unitNumber) {
     
     const unitKey = unitNumber.toString();
     if (!data.units[unitKey]) {
+        console.error('الوحدة غير موجودة');
         isLoading = false;
         return;
     }
@@ -93,6 +100,7 @@ window.loadUnit = async function(unitNumber) {
 };
 
 window.loadFinalExam = async function() {
+    console.log('تحميل الامتحان الشامل');
     if (isLoading) return;
     isLoading = true;
     
@@ -134,7 +142,7 @@ function displayQuestion() {
     let optionsHtml = '';
     q.options.forEach((opt, index) => {
         const isSelected = currentQuiz.userAnswers[currentQuiz.currentIndex] === index;
-        optionsHtml += `<div class="option ${isSelected ? 'selected' : ''}" onclick="window.selectOption(${index})">${opt}</div>`;
+        optionsHtml += `<div class="option ${isSelected ? 'selected' : ''}" onclick="selectOption(${index})">${opt}</div>`;
     });
     optionsContainer.innerHTML = optionsHtml;
     
@@ -157,7 +165,7 @@ window.selectOption = function(optionIndex) {
     
     if (currentQuiz.currentIndex < currentQuiz.totalQuestions - 1) {
         setTimeout(() => {
-            window.nextQuestion();
+            nextQuestion();
         }, 300);
     }
 };
@@ -230,10 +238,5 @@ window.backToMenu = function() {
     };
 };
 
-// حماية إضافية
+// حماية بسيطة
 document.addEventListener('contextmenu', (e) => e.preventDefault());
-document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 'u' || e.key === 'U')) || e.key === 'F12') {
-        e.preventDefault();
-    }
-});
