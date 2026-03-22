@@ -86,7 +86,6 @@ window.loadUnit = async function(unitNumber) {
     if (isLoading) return;
     isLoading = true;
     
-    // تأكد من العناصر موجودة
     if (!mainMenu) initElements();
     
     const data = await loadQuestions();
@@ -139,26 +138,17 @@ window.loadFinalExam = async function() {
 function startQuiz() {
     console.log('بدء الامتحان');
     
-    // تأكد مرة ثانية
     if (!mainMenu || !quizArea || !resultArea) {
         initElements();
     }
     
-    // استخدم style.display بدل classList
     if (mainMenu) mainMenu.style.display = 'none';
     if (quizArea) quizArea.style.display = 'block';
     if (resultArea) resultArea.style.display = 'none';
     
-    // تأكد أن منطقة الامتحان ظاهرة
-    if (quizArea) {
-        quizArea.classList.remove('hidden');
-    }
-    if (mainMenu) {
-        mainMenu.classList.add('hidden');
-    }
-    if (resultArea) {
-        resultArea.classList.add('hidden');
-    }
+    if (quizArea) quizArea.classList.remove('hidden');
+    if (mainMenu) mainMenu.classList.add('hidden');
+    if (resultArea) resultArea.classList.add('hidden');
     
     displayQuestion();
     updateNavButtons();
@@ -196,7 +186,12 @@ window.selectOption = function(optionIndex) {
         }
     });
     
-    if (currentQuiz.currentIndex < currentQuiz.totalQuestions - 1) {
+    // التحقق: إذا كان هذا هو آخر سؤال، أظهر النتيجة فوراً
+    if (currentQuiz.currentIndex === currentQuiz.totalQuestions - 1) {
+        setTimeout(() => {
+            showResults();
+        }, 300);
+    } else {
         setTimeout(() => {
             nextQuestion();
         }, 300);
@@ -204,12 +199,17 @@ window.selectOption = function(optionIndex) {
 };
 
 window.nextQuestion = function() {
+    // إذا كان هذا هو آخر سؤال، أظهر النتيجة
+    if (currentQuiz.currentIndex === currentQuiz.totalQuestions - 1) {
+        showResults();
+        return;
+    }
+    
+    // غير ذلك انتقل للسؤال التالي
     if (currentQuiz.currentIndex < currentQuiz.totalQuestions - 1) {
         currentQuiz.currentIndex++;
         displayQuestion();
         updateNavButtons();
-    } else {
-        showResults();
     }
 };
 
@@ -226,12 +226,17 @@ function updateNavButtons() {
 }
 
 function showResults() {
+    console.log('عرض النتيجة');
+    
     let score = 0;
     currentQuiz.questions.forEach((q, index) => {
         if (currentQuiz.userAnswers[index] === q.answer) {
             score++;
         }
     });
+    
+    if (quizArea) quizArea.style.display = 'none';
+    if (resultArea) resultArea.style.display = 'block';
     
     if (quizArea) quizArea.classList.add('hidden');
     if (resultArea) resultArea.classList.remove('hidden');
