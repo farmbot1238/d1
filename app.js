@@ -30,26 +30,19 @@ function initElements() {
     percentageDisplay = document.getElementById('percentageDisplay');
     detailsContainer = document.getElementById('detailsContainer');
     
-    console.log('العناصر بعد التهيئة:', {
-        mainMenu: mainMenu ? 'موجود' : 'غير موجود',
-        quizArea: quizArea ? 'موجود' : 'غير موجود',
-        resultArea: resultArea ? 'موجود' : 'غير موجود'
+    console.log('العناصر:', {
+        mainMenu: mainMenu ? '✅' : '❌',
+        quizArea: quizArea ? '✅' : '❌',
+        resultArea: resultArea ? '✅' : '❌'
     });
 }
 
-// انتظار تحميل الصفحة
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOM جاهز');
-        initElements();
-        loadQuestions();
-    });
-} else {
-    // DOM جاهز بالفعل
-    console.log('DOM جاهز (مباشر)');
+// انتظر تحميل الصفحة كاملة
+window.addEventListener('load', function() {
+    console.log('الصفحة تحمّلت بالكامل');
     initElements();
     loadQuestions();
-}
+});
 
 async function loadQuestions() {
     if (allQuestionsData) return allQuestionsData;
@@ -63,18 +56,18 @@ async function loadQuestions() {
         return allQuestionsData;
     } catch (error) {
         console.error('خطأ:', error);
-        showError('حدث خطأ في تحميل الأسئلة. تأكد من وجود ملف questions.json');
+        showError('حدث خطأ في تحميل الأسئلة');
         return null;
     }
 }
 
 function showError(message) {
-    const mainMenuDiv = document.getElementById('mainMenu');
-    if (mainMenuDiv) {
-        mainMenuDiv.innerHTML = `
-            <div style="text-align:center; padding:50px; background:#fff5e6; border-radius:30px; margin:20px;">
-                <p style="color:#8b1538; font-size:1.3em;">⚠️ ${message}</p>
-                <button onclick="location.reload()" style="margin-top:20px; padding:12px 30px; background:#0f4e3a; color:white; border:none; border-radius:30px; cursor:pointer;">إعادة تحميل</button>
+    const menu = document.getElementById('mainMenu');
+    if (menu) {
+        menu.innerHTML = `
+            <div style="text-align:center; padding:50px;">
+                <p style="color:#8b1538;">⚠️ ${message}</p>
+                <button onclick="location.reload()" style="margin-top:20px; padding:10px 30px; background:#0f4e3a; color:white; border:none; border-radius:30px;">إعادة تحميل</button>
             </div>
         `;
     }
@@ -93,10 +86,8 @@ window.loadUnit = async function(unitNumber) {
     if (isLoading) return;
     isLoading = true;
     
-    // تأكد من تهيئة العناصر
-    if (!mainMenu) {
-        initElements();
-    }
+    // تأكد من العناصر موجودة
+    if (!mainMenu) initElements();
     
     const data = await loadQuestions();
     if (!data) {
@@ -124,10 +115,7 @@ window.loadFinalExam = async function() {
     if (isLoading) return;
     isLoading = true;
     
-    // تأكد من تهيئة العناصر
-    if (!mainMenu) {
-        initElements();
-    }
+    if (!mainMenu) initElements();
     
     const data = await loadQuestions();
     if (!data) {
@@ -151,26 +139,26 @@ window.loadFinalExam = async function() {
 function startQuiz() {
     console.log('بدء الامتحان');
     
-    // تأكد من وجود العناصر مرة ثانية
+    // تأكد مرة ثانية
     if (!mainMenu || !quizArea || !resultArea) {
         initElements();
     }
     
-    // إخفاء القائمة وإظهار منطقة الامتحان
-    if (mainMenu) {
-        mainMenu.style.display = 'none';
-    }
+    // استخدم style.display بدل classList
+    if (mainMenu) mainMenu.style.display = 'none';
+    if (quizArea) quizArea.style.display = 'block';
+    if (resultArea) resultArea.style.display = 'none';
+    
+    // تأكد أن منطقة الامتحان ظاهرة
     if (quizArea) {
-        quizArea.style.display = 'block';
+        quizArea.classList.remove('hidden');
+    }
+    if (mainMenu) {
+        mainMenu.classList.add('hidden');
     }
     if (resultArea) {
-        resultArea.style.display = 'none';
+        resultArea.classList.add('hidden');
     }
-    
-    // إزالة كلاس hidden من العناصر
-    if (mainMenu) mainMenu.classList.add('hidden');
-    if (quizArea) quizArea.classList.remove('hidden');
-    if (resultArea) resultArea.classList.add('hidden');
     
     displayQuestion();
     updateNavButtons();
@@ -181,24 +169,19 @@ function displayQuestion() {
     if (!currentQuiz.questions.length) return;
     
     const q = currentQuiz.questions[currentQuiz.currentIndex];
-    if (!q) return;
+    if (!q || !questionText) return;
     
-    if (questionText) questionText.textContent = q.question;
+    questionText.textContent = q.question;
     
     let optionsHtml = '';
     q.options.forEach((opt, index) => {
         const isSelected = currentQuiz.userAnswers[currentQuiz.currentIndex] === index;
         optionsHtml += `<div class="option ${isSelected ? 'selected' : ''}" onclick="selectOption(${index})">${opt}</div>`;
     });
-    if (optionsContainer) optionsContainer.innerHTML = optionsHtml;
     
-    if (questionCounter) {
-        questionCounter.textContent = `سؤال ${currentQuiz.currentIndex + 1}/${currentQuiz.totalQuestions}`;
-    }
-    if (progressBar) {
-        const progressPercent = ((currentQuiz.currentIndex + 1) / currentQuiz.totalQuestions) * 100;
-        progressBar.style.width = `${progressPercent}%`;
-    }
+    if (optionsContainer) optionsContainer.innerHTML = optionsHtml;
+    if (questionCounter) questionCounter.textContent = `سؤال ${currentQuiz.currentIndex + 1}/${currentQuiz.totalQuestions}`;
+    if (progressBar) progressBar.style.width = `${((currentQuiz.currentIndex + 1) / currentQuiz.totalQuestions) * 100}%`;
 }
 
 window.selectOption = function(optionIndex) {
@@ -277,9 +260,14 @@ function showResults() {
 }
 
 window.backToMenu = function() {
+    if (mainMenu) mainMenu.style.display = 'block';
+    if (quizArea) quizArea.style.display = 'none';
+    if (resultArea) resultArea.style.display = 'none';
+    
     if (mainMenu) mainMenu.classList.remove('hidden');
     if (quizArea) quizArea.classList.add('hidden');
     if (resultArea) resultArea.classList.add('hidden');
+    
     currentQuiz = {
         questions: [],
         userAnswers: [],
@@ -288,5 +276,5 @@ window.backToMenu = function() {
     };
 };
 
-// حماية بسيطة
+// حماية
 document.addEventListener('contextmenu', (e) => e.preventDefault());
